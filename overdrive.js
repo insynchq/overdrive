@@ -3,6 +3,7 @@ var Overdrive = {
   CLIENT_ID: '849493785001.apps.googleusercontent.com',
 
   events: [],
+  noAlert: false,
 
   initializeModel: function(model) {
     var string = model.createString(Overdrive.defaultContent);
@@ -12,7 +13,9 @@ var Overdrive = {
   send: function(o) {
     Overdrive.events.push(o);
     console.log(o);
-    alert();
+    if (!Overdrive.noAlert) {
+      alert('.');
+    }
   },
 
   sendTextEvent: function(e) {

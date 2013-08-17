@@ -35,6 +35,9 @@ class OverdriveEventListener(sublime_plugin.EventListener):
     od_file = files.get(view.id())
     if not od_file:
       return
+    cmd = view.command_history(0, True)
+    if cmd[0] == 'overdrive_edit':
+      return
     curr_text = odutils.get_text(view)
     od_file.set_text(curr_text)
 
@@ -51,9 +54,12 @@ class OverdriveView(object):
     self.view.set_read_only(True)
     self.view.set_name('Loading file...')
 
+  def begin_edit(self):
+    return self.view.begin_edit('overdrive_edit')
+
   def set_text(self, text):
     self.view.set_read_only(False)
-    edit = self.view.begin_edit()
+    edit = self.begin_edit()
     self.view.insert(edit, 0, text)
     self.view.end_edit(edit)
     self.view.erase_status('Overdrive')
@@ -62,13 +68,13 @@ class OverdriveView(object):
     self.view.set_name(title)
 
   def insert_text(self, index, text):
-    edit = self.view.begin_edit()
+    edit = self.begin_edit()
     self.view.insert(edit, index, text)
     self.view.end_edit(edit)
 
   def delete_text(self, index, text):
     region = sublime.Region(index, index + len(text))
-    edit = self.view.begin_edit()
+    edit = self.begin_edit()
     self.view.erase(edit, region)
     self.view.end_edit(edit)
 
