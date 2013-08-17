@@ -5,13 +5,12 @@ from ghost import Ghost
 
 class Bridge(object):
 
-  callbacks = dict()
-
   def __init__(self, **kwargs):
     kwargs.setdefault('wait_timeout', 60)
     self.user_id = kwargs.pop('user_id')
     self.access_token = kwargs.pop('access_token')
     self.ghost = Ghost(**kwargs)
+    self.callbacks = {}
 
   def open(self, url):
     self.ghost.open(url)
@@ -30,18 +29,25 @@ class Bridge(object):
     self.js('Overdrive.create', title, content, self.user_id,
             self.access_token)
 
+  def set_text(self, text):
+    self.js('Overdrive.setText', text)
+
   def get_events(self):
     qt_str, _ = self.js('Overdrive.getEvents')
     return json.loads(str(qt_str))
+
+  def call_events(self):
+    for event in self.get_events():
+      for callback in self.callbacks.get(str(event.pop('type')), []):
+        callback(**event)
 
   def listen(self):
     self.listening = True
     while self.listening:
       try:
         self.ghost.wait_for_alert()
-        for event in self.get_events():
-          for callback in self.callbacks.get(str(event.pop('type')), []):
-            callback(**event)
+        import sublime
+        sublime.set_timeout(self.call_events, 0)
       except Exception as e:
         if str(e) != 'User has not been alerted.':
           raise
