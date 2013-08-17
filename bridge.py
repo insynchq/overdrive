@@ -1,5 +1,6 @@
 import json
 
+import sublime
 from ghost import Ghost
 
 
@@ -34,7 +35,9 @@ class Bridge(object):
 
   def get_events(self):
     qt_str, _ = self.js('Overdrive.getEvents')
-    return json.loads(str(qt_str))
+    s = str(qt_str)
+    import q; q('events', s)
+    return json.loads(s)
 
   def call_events(self):
     for event in self.get_events():
@@ -46,7 +49,6 @@ class Bridge(object):
     while self.listening:
       try:
         self.ghost.wait_for_alert()
-        import sublime
         sublime.set_timeout(self.call_events, 0)
       except Exception as e:
         if str(e) != 'User has not been alerted.':
