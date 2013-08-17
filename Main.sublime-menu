@@ -1,0 +1,19 @@
+[{
+	"caption": "Tools",
+	"mnemonic": "t",
+	"id": "tools",
+	"children": [{
+		"caption": "Overdrive",
+		"id": "overdrive",
+		"children": [
+			{
+				"caption": "Share file",
+				"command": "overdrive_share"
+			},
+			{
+				"caption": "Join file",
+				"command": "overdrive_join"
+			}
+		]
+	}]
+}]
