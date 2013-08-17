@@ -73,7 +73,7 @@ var Overdrive = {
             'resource': {
               'value': '',
               'type': 'anyone',
-              'role': 'reader'
+              'role': 'writer'
             }
           }).execute(function(resp) {
             if (resp.error) {
