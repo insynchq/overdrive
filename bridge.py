@@ -1,4 +1,3 @@
-from functools import wraps
 import json
 
 from ghost import Ghost
@@ -24,8 +23,8 @@ class Bridge(object):
     self.js('Overdrive.open(%r, %r, %r)', file_id, self.user_id,
             self.access_token)
 
-  def create_file(self, title):
-    self.js('Overdrive.create(%r, %r, %r)', title, self.user_id,
+  def create_file(self, title, content):
+    self.js('Overdrive.create(%r, %r, %r, %r)', title, self.user_id,
             self.access_token)
 
   def listen(self):

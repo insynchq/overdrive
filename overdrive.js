@@ -3,7 +3,7 @@ var Overdrive = {
   CLIENT_ID: '849493785001.apps.googleusercontent.com',
 
   initializeModel: function(model) {
-    var string = model.createString('Hello, world');
+    var string = model.createString(Overdrive.defaultContent);
     model.getRoot().set('text', string);
   },
 
@@ -43,7 +43,8 @@ var Overdrive = {
     });
   },
 
-  create: function(title, userId, accessToken) {
+  create: function(title, content, userId, accessToken) {
+    Overdrive.defaultContent = content;
     gapi.load('auth:client', function() {
       gapi.auth.setToken({access_token: accessToken});
       rtclient.createRealtimeFile(title, rtclient.REALTIME_MIMETYPE, function(file) {
