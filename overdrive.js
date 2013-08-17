@@ -35,8 +35,12 @@ var Overdrive = {
     return JSON.stringify(events);
   },
 
+  setText: function(text) {
+    Overdrive.string.setText(text);
+  },
+
   onFileLoaded: function(doc) {
-    var string = doc.getModel().getRoot().get('text');
+    Overdrive.string = string = doc.getModel().getRoot().get('text');
     string.addEventListener(
       gapi.drive.realtime.EventType.TEXT_INSERTED,
       Overdrive.sendTextEvent
