@@ -1,10 +1,16 @@
+var CLIENT_ID = '849493785001.apps.googleusercontent.com';
+
 function initializeModel(model) {
   var string = model.createString('Hello, world');
   model.getRoot().set('text', string);
 }
 
+function send(o) {
+  alert(JSON.stringify(o));
+}
+
 function sendEvent(e) {
-  alert(JSON.stringify({
+  send({
     bubbles: e.bubbles,
     isLocal: e.isLocal,
     sessionId: e.sessionId,
@@ -12,7 +18,7 @@ function sendEvent(e) {
     userId: e.userId,
     index: e.index,
     text: e.text
-  }));
+  });
 }
 
 function onFileLoaded(doc) {
@@ -29,11 +35,15 @@ function onFileLoaded(doc) {
     string,
     document.getElementById('editor')
   );
+  send({
+    type: 'file_content_loaded',
+    text: string.getText()
+  });
 }
 
-function start(fileIds, userId, accessToken) {
+function start(fileId, userId, accessToken) {
   var options = {
-    clientId: '849493785001.apps.googleusercontent.com',
+    clientId: CLIENT_ID,
     initializeModel: initializeModel,
     autoCreate: false,
     newFileMimeType: null, // Using default.
@@ -42,10 +52,47 @@ function start(fileIds, userId, accessToken) {
     afterAuth: null // No action.
   };
   var rtLoader = new rtclient.RealtimeLoader(options);
-  rtclient.params.fileIds = fileIds;
+  rtclient.params.fileIds = fileId;
   rtclient.params.userId = userId;
   gapi.load('auth:client,drive-realtime,drive-share', function() {
     gapi.auth.setToken({access_token: accessToken});
     rtLoader.load();
+    rtclient.getFileMetadata(fileId, function(metadata) {
+      if (metadata.error) {
+        send({
+          type: 'error',
+          error: 'File not found'
+        });
+      } else {
+        send({
+          type: 'file_metadata_loaded',
+          metadata: metadata
+        });
+      }
+    });
+  });
+}
+
+function auth(userId) {
+  gapi.load('auth:client', function() {
+    gapi.auth.authorize({
+      client_id: CLIENT_ID,
+      response_type: 'token',
+      scope: [
+        rtclient.INSTALL_SCOPE,
+        rtclient.FILE_SCOPE,
+        rtclient.OPENID_SCOPE
+      ],
+      immediate: false
+    }, function(token) {
+      if (token) {
+        send({
+          type: 'authorized',
+          token: {
+            access_token: token.access_token
+          }
+        });
+      }
+    });
   });
 }
