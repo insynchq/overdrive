@@ -20,7 +20,7 @@ class Bridge(object):
     args = ', '.join(map(json.dumps, args))
     script += '(' + args + ')'
     import q; q(script)
-    self.ghost.evaluate(script)
+    return self.ghost.evaluate(script)
 
   def open_file(self, file_id):
     self.js('Overdrive.open', file_id, self.user_id,
@@ -30,14 +30,18 @@ class Bridge(object):
     self.js('Overdrive.create', title, content, self.user_id,
             self.access_token)
 
+  def get_events(self):
+    qt_str, _ = self.js('Overdrive.getEvents')
+    return json.loads(str(qt_str))
+
   def listen(self):
     self.listening = True
     while self.listening:
       try:
-        qt_str, _ = self.ghost.wait_for_alert()
-        data = json.loads(str(qt_str))
-        for callback in self.callbacks.get(str(data.pop('type')), []):
-          callback(**data)
+        self.ghost.wait_for_alert()
+        for event in self.get_events():
+          for callback in self.callbacks.get(str(event.pop('type')), []):
+            callback(**event)
       except Exception as e:
         if str(e) != 'User has not been alerted.':
           raise
@@ -55,7 +59,7 @@ class Bridge(object):
 if __name__ == '__main__':
   bridge = Bridge(
     user_id='109552611493281203639',
-    access_token='ya29.AHES6ZQbe47Q8HegYNmXphPf0OiFH9AM6tnVPypx9rl4NiE',
+    access_token='ya29.AHES6ZQItbPFcPi0nWHMAKnoi31DfYZ0EcoZF2ooiwfo2d4',
   )
   bridge.open('http://localhost:3000')
 

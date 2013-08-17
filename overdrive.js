@@ -2,19 +2,20 @@ var Overdrive = {
 
   CLIENT_ID: '849493785001.apps.googleusercontent.com',
 
+  events: [],
+
   initializeModel: function(model) {
     var string = model.createString(Overdrive.defaultContent);
     model.getRoot().set('text', string);
   },
 
   send: function(o) {
-    alert(JSON.stringify(o));
-  },
-  send2: function(o) {
-    console.log(JSON.stringify(o));
+    Overdrive.events.push(o);
+    console.log(o);
+    alert();
   },
 
-  sendEvent: function(e) {
+  sendTextEvent: function(e) {
     Overdrive.send({
       type: e.type,
       event: {
@@ -28,15 +29,21 @@ var Overdrive = {
     });
   },
 
+  getEvents: function() {
+    var events = Overdrive.events;
+    Overdrive.events = [];
+    return JSON.stringify(events);
+  },
+
   onFileLoaded: function(doc) {
     var string = doc.getModel().getRoot().get('text');
     string.addEventListener(
       gapi.drive.realtime.EventType.TEXT_INSERTED,
-      Overdrive.sendEvent
+      Overdrive.sendTextEvent
     );
     string.addEventListener(
       gapi.drive.realtime.EventType.TEXT_DELETED,
-      Overdrive.sendEvent
+      Overdrive.sendTextEvent
     );
     gapi.drive.realtime.databinding.bindString(
       string,
