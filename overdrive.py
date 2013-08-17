@@ -9,5 +9,5 @@ class OverdriveShareCommand(sublime_plugin.ApplicationCommand):
 
 class OverdriveJoinCommand(sublime_plugin.ApplicationCommand):
 
-    def  run(self):
+    def run(self):
         pass
