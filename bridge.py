@@ -17,14 +17,17 @@ class Bridge(object):
     self.ghost.open(url)
 
   def js(self, script, *args):
-    self.ghost.evaluate(script % args)
+    args = ', '.join(map(json.dumps, args))
+    script += '(' + args + ')'
+    import q; q(script)
+    self.ghost.evaluate(script)
 
   def open_file(self, file_id):
-    self.js('Overdrive.open(%r, %r, %r)', file_id, self.user_id,
+    self.js('Overdrive.open', file_id, self.user_id,
             self.access_token)
 
   def create_file(self, title, content):
-    self.js('Overdrive.create(%r, %r, %r, %r)', title, self.user_id,
+    self.js('Overdrive.create', title, content, self.user_id,
             self.access_token)
 
   def listen(self):
@@ -60,5 +63,5 @@ if __name__ == '__main__':
   def test(**kwargs):
     print kwargs
 
-  bridge.create_file('Testing')
+  bridge.create_file('Testing', 'Hello world')
   bridge.listen()

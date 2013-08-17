@@ -1,14 +1,5 @@
 import sublime, sublime_plugin
-import sys
 import q
-
-_paths = [
-'/Users/marte/.virtualenvs/progsports/lib/python2.7/site-packages',
-'/Library/Python/2.7/site-packages',
-]
-for _p in _paths:
-  if _p not in sys.path:
-    sys.path.append(_p)
 
 import ghost
 import odutils
@@ -21,7 +12,7 @@ files = {}
 class OverdriveJoinCommand(sublime_plugin.WindowCommand):
 
   def run(self):
-    self.window.show_input_panel("Open Doc:", "", self.on_done, None, None)
+    self.window.show_input_panel("Open File:", "", self.on_done, None, None)
 
   def on_done(self, file_id):
     if not file_id:
@@ -30,10 +21,12 @@ class OverdriveJoinCommand(sublime_plugin.WindowCommand):
     files[od_view.id] = odfile.open_file(file_id, od_view)
 
 
-class OverdriveShareCommand(sublime_plugin.ApplicationCommand):
+class OverdriveShareCommand(sublime_plugin.TextCommand):
 
-  def run(self):
-    pass
+  def run(self, edit):
+    self.view.set_status("Overdrive", "Sharing file...")
+    od_view = OverdriveView(self.view)
+    odfile.share_file(self.view.name(), od_view)
 
 
 class OverdriveEventListener(sublime_plugin.EventListener):
