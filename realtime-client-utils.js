@@ -72,7 +72,7 @@ rtclient.getParams = function() {
       params[paramStr[0]] = unescape(paramStr[1]);
     }
   }
-  console.log(params);
+  // console.log(params);
   return params;
 }
 
@@ -95,7 +95,7 @@ rtclient.getOption = function(options, key, defaultValue) {
   if (value == undefined) {
     console.error(key + ' should be present in the options.');
   }
-  console.log(value);
+  // console.log(value);
   return value;
 }
 
@@ -157,7 +157,7 @@ rtclient.Authorizer.prototype.authorize = function(onAuthComplete) {
       user_id: userId,
       immediate: false
     }, handleAuthResult);
-    console.log(clientId);
+    // console.log(clientId);
   };
 
   // Try with no popups first.
@@ -324,15 +324,15 @@ rtclient.RealtimeLoader.prototype.start = function() {
  * Handles errors thrown by the Realtime API.
  */
 rtclient.RealtimeLoader.prototype.handleErrors = function(e) {
-  if(e.type == gapi.drive.realtime.ErrorType.TOKEN_REFRESH_REQUIRED) {
-    authorizer.authorize();
-  } else if(e.type == gapi.drive.realtime.ErrorType.CLIENT_ERROR) {
-    alert("An Error happened: " + e.message);
-    window.location.href= "/";
-  } else if(e.type == gapi.drive.realtime.ErrorType.NOT_FOUND) {
-    alert("The file was not found. It does not exist or you do not have read access to the file.");
-    window.location.href= "/";
-  }
+  // if(e.type == gapi.drive.realtime.ErrorType.TOKEN_REFRESH_REQUIRED) {
+  //   authorizer.authorize();
+  // } else if(e.type == gapi.drive.realtime.ErrorType.CLIENT_ERROR) {
+  //   alert("An Error happened: " + e.message);
+  //   window.location.href= "/";
+  // } else if(e.type == gapi.drive.realtime.ErrorType.NOT_FOUND) {
+  //   alert("The file was not found. It does not exist or you do not have read access to the file.");
+  //   window.location.href= "/";
+  // }
 };
 
 
