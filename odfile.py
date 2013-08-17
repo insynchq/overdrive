@@ -27,6 +27,14 @@ def open_file(file_id, od_view):
   @b.on('error')
   def error(error):
     sublime.set_timeout(od_file.od_view.close, 0)
+  @b.on('text_inserted')
+  def text_inserted(event):
+    q('insert', event)
+    sublime.set_timeout(functools.partial(od_file.od_view.insert_text, event['index'], event['text']), 0)
+  @b.on('text_deleted')
+  def text_deleted(event):
+    q('delete', event)
+    sublime.set_timeout(functools.partial(od_file.od_view.delete_text, event['index'], event['text']), 0)
   return od_file
 
 def save_file(title, od_view):

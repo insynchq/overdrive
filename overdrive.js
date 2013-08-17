@@ -10,16 +10,21 @@ var Overdrive = {
   send: function(o) {
     alert(JSON.stringify(o));
   },
+  send2: function(o) {
+    console.log(JSON.stringify(o));
+  },
 
   sendEvent: function(e) {
     Overdrive.send({
-      bubbles: e.bubbles,
-      isLocal: e.isLocal,
-      sessionId: e.sessionId,
       type: e.type,
-      userId: e.userId,
-      index: e.index,
-      text: e.text
+      event: {
+        bubbles: e.bubbles,
+        isLocal: e.isLocal,
+        sessionId: e.sessionId,
+        userId: e.userId,
+        index: e.index,
+        text: e.text
+      }
     });
   },
 
