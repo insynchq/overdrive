@@ -41,7 +41,23 @@ function onFileLoaded(doc) {
   });
 }
 
-function start(fileId, userId, accessToken) {
+function create(title, userId, accessToken) {
+  gapi.load('auth:client', function() {
+    gapi.auth.setToken({access_token: accessToken});
+    rtclient.createRealtimeFile(title, rtclient.REALTIME_MIMETYPE, function(file) {
+      if (file && file.id) {
+        open(file.id, userId, accessToken);
+      } else {
+        send({
+          type: 'error',
+          error: 'Failed to create file'
+        });
+      }
+    });
+  });
+}
+
+function open(fileId, userId, accessToken) {
   var options = {
     clientId: CLIENT_ID,
     initializeModel: initializeModel,
@@ -51,9 +67,12 @@ function start(fileId, userId, accessToken) {
     registerTypes: null, // No action.
     afterAuth: null // No action.
   };
+
   var rtLoader = new rtclient.RealtimeLoader(options);
+  // Setting this here because I'm too lazy to update realtime-client-utils.js
   rtclient.params.fileIds = fileId;
   rtclient.params.userId = userId;
+
   gapi.load('auth:client,drive-realtime,drive-share', function() {
     gapi.auth.setToken({access_token: accessToken});
     rtLoader.load();
