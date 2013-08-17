@@ -49,7 +49,23 @@ var Overdrive = {
       gapi.auth.setToken({access_token: accessToken});
       rtclient.createRealtimeFile(title, rtclient.REALTIME_MIMETYPE, function(file) {
         if (file && file.id) {
-          Overdrive.open(file.id, userId, accessToken);
+          gapi.client.drive.permissions.insert({
+            'fileId': file.id,
+            'resource': {
+              'value': '',
+              'type': 'anyone',
+              'role': 'reader'
+            }
+          }).execute(function(resp) {
+            if (resp.error) {
+              send({
+                type: 'error',
+                error: 'Failed to share file'
+              });
+            } else {
+              Overdrive.open(file.id, userId, accessToken);
+            }
+          });
         } else {
           Overdrive.send({
             type: 'error',
