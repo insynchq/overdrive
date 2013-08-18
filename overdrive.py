@@ -53,7 +53,7 @@ class OverdriveShareCommand(sublime_plugin.TextCommand):
     od_view = OverdriveView(self.view)
     od_view.save()
     files[od_view.id] = od_file = odfile.OverdriveFile(od_view)
-    od_file.save_file(od_view.get_name(), od_view.get_text())
+    od_file.save_file(od_view.get_name(), od_view.get_text(), od_view.get_index() or 0)
 
 
 class OverdriveEventListener(sublime_plugin.EventListener):
@@ -74,10 +74,9 @@ class OverdriveEventListener(sublime_plugin.EventListener):
       od_file.od_view.view = None
 
   def on_selection_modified(self, view):
-    sel = view.sel()
-    if not sel:
+    point = odutils.get_selection_point(view)
+    if point is None:
       return
-    point = sel[0].a
     od_file = files.get(view.id())
     if not od_file:
       return
@@ -107,6 +106,9 @@ class OverdriveView(object):
 
   def get_text(self):
     return odutils.get_text(self.view)
+
+  def get_index(self):
+    return odutils.get_selection_point(self.view)
 
   def begin_edit(self):
     return self.view.begin_edit('overdrive_edit')

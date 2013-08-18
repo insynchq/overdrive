@@ -7,6 +7,12 @@ import sublime
 def get_text(view):
   return view.substr(sublime.Region(0, view.size()))
 
+def get_selection_point(view):
+  sel = view.sel()
+  if not sel:
+    return None
+  return sel[0].a
+
 
 def auto_main_threaded(fn):
   @functools.wraps(fn)

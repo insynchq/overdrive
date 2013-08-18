@@ -21,6 +21,7 @@ class OverdriveFile(object):
     self.bridge.on('file_content_loaded')(self.on_content_loaded)
     self.bridge.on('text_inserted')(self.on_text_inserted)
     self.bridge.on('text_deleted')(self.on_text_deleted)
+    self.bridge.on('reference_shifted')(self.on_ref_shifted)
     self.bridge.open()
     self.bridge.set_view(od_view.id)
     thread = threading.Thread(target=self.bridge.wait)
@@ -47,17 +48,22 @@ class OverdriveFile(object):
       return
     self.od_view.delete_text(event['index'], event['text'])
 
+  def on_ref_shifted(self, event):
+    if event['isLocal']:
+      return
+    self.od_view.set_session_selection(event['userId'], event['sessionId'], event['newIndex'])
+
   def open(self, file_id):
     self.bridge.open_file(file_id)
 
-  def save_file(self, title, content):
-    self.bridge.create_file(title, content)
+  def save_file(self, title, content, index):
+    self.bridge.create_file(title, content, index)
 
   def set_text(self, text):
     self.bridge.set_text(text)
 
-  def set_selection(self, point):
-    pass
+  def set_selection(self, index):
+    self.bridge.set_ref(index)
 
 
 def mock_open(od_file):

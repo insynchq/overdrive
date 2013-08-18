@@ -30,8 +30,8 @@ class Bridge(object):
     self.js('Overdrive.open', file_id, self.user_id,
             self.access_token)
 
-  def create_file(self, title, content):
-    self.js('Overdrive.create', title, content, self.user_id,
+  def create_file(self, title, content, index):
+    self.js('Overdrive.create', title, content, index, self.user_id,
             self.access_token)
 
   def set_view(self, view):
@@ -39,6 +39,9 @@ class Bridge(object):
 
   def set_text(self, text):
     self.js('Overdrive.setText', text)
+
+  def set_ref(self, index):
+    self.js('Overdrive.setRef', index)
 
   def call_event(self, event):
     for callback in self.callbacks.get(str(event.pop('type')), []):
