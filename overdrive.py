@@ -70,8 +70,10 @@ class OverdriveEventListener(sublime_plugin.EventListener):
 
   def on_close(self, view):
     od_file = files.pop(view.id(), None)
-    if od_file:
-      od_file.od_view.view = None
+    if not od_file:
+      return
+    od_file.od_view.view = None
+    od_file.close()
 
   def on_selection_modified(self, view):
     point = odutils.get_selection_point(view)
@@ -135,8 +137,10 @@ class OverdriveView(object):
         self.view.set_syntax_file(syntax)
     else:
       self.view.erase_status('Overdrive')
-      sublime.message_dialog('File shared! Others can join in this file '
-                             'through this ID:\n%s' % metadata['id'])
+      self.view.window().show_input_panel("File shared! Other can join this file through this ID",
+        metadata['id'], None, None, None)
+      # sublime.message_dialog('File shared! Others can join in this file '
+      #                        'through this ID:\n%s' % metadata['id'])
 
   @odutils.auto_main_threaded
   def insert_text(self, index, text):

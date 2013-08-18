@@ -43,6 +43,9 @@ class Bridge(object):
   def set_ref(self, index):
     self.js('Overdrive.setRef', index)
 
+  def close_session(self):
+    self.js('Overdrive.setRef', -1)
+
   def call_event(self, event):
     for callback in self.callbacks.get(str(event.pop('type')), []):
       callback(**event)

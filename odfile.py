@@ -51,7 +51,10 @@ class OverdriveFile(object):
   def on_ref_shifted(self, event):
     if event['isLocal']:
       return
-    self.od_view.set_session_selection(event['userId'], event['sessionId'], event['index'])
+    if event['index'] == -1:
+      self.od_view.close_session(event['userId'], event['sessionId'])
+    else:
+      self.od_view.set_session_selection(event['userId'], event['sessionId'], event['index'])
 
   def open(self, file_id):
     self.bridge.open_file(file_id)
@@ -64,6 +67,9 @@ class OverdriveFile(object):
 
   def set_selection(self, index):
     self.bridge.set_ref(index)
+
+  def close(self):
+    self.bridge.close_session()
 
 
 def mock_open(od_file):
