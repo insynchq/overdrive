@@ -6,8 +6,10 @@ var Overdrive = {
   events: [],
 
   initializeModel: function(model) {
-    var string = model.createString(Overdrive.defaultContent);
+    var string = model.createString(Overdrive.content);
     model.getRoot().set('text', string);
+    var map = model.createMap();
+    model.getRoot().set('selections', map);
   },
 
   send: function(e) {
@@ -33,20 +35,6 @@ var Overdrive = {
     }
   },
 
-  sendTextEvent: function(e) {
-    Overdrive.send({
-      type: e.type,
-      event: {
-        bubbles: e.bubbles,
-        isLocal: e.isLocal,
-        sessionId: e.sessionId,
-        userId: e.userId,
-        index: e.index,
-        text: e.text
-      }
-    });
-  },
-
   setView: function(view) {
     Overdrive.view = view;
   },
@@ -55,8 +43,15 @@ var Overdrive = {
     Overdrive.string.setText(text);
   },
 
+  setRef: function(index) {
+    Overdrive.ref.index = Overdrive.index = index;
+  },
+
   onFileLoaded: function(doc) {
-    Overdrive.string = string = doc.getModel().getRoot().get('text');
+    var model = doc.getModel();
+    // Text
+    var string;
+    Overdrive.string = string = model.getRoot().get('text');
     string.addEventListener(
       gapi.drive.realtime.EventType.TEXT_INSERTED,
       Overdrive.sendTextEvent
@@ -73,10 +68,73 @@ var Overdrive = {
       type: 'file_content_loaded',
       text: string.getText()
     });
+
+    // Selection
+    var refName;
+    doc.getCollaborators().forEach(function(c) {
+      if (c.isMe) {
+        refName = c.sessionId + ':' + c.userId;
+      }
+    });
+    Overdrive.index = Overdrive.index || 0;
+    var selections = model.getRoot().get('selections');
+    var ref = selections.get(refName);
+    if (ref) {
+      Overdrive.ref = ref;
+    } else {
+      Overdrive.ref = ref = string.registerReference(Overdrive.index, false);
+      selections.set(refName, ref);
+    }
+    selections.values().forEach(function(r) {
+      r.addEventListener(
+        gapi.drive.realtime.EventType.REFERENCE_SHIFTED,
+        Overdrive.sendRefEvent
+      );
+    });
+    selections.addEventListener(
+      gapi.drive.realtime.EventType.VALUE_CHANGED,
+      function(e) {
+        if (e.newValue) {
+          e.newValue.addEventListener(
+            gapi.drive.realtime.EventType.REFERENCE_SHIFTED,
+            Overdrive.sendRefEvent
+          )
+        }
+      }
+    )
   },
 
-  create: function(title, content, userId, accessToken) {
-    Overdrive.defaultContent = content;
+  sendTextEvent: function(e) {
+    Overdrive.send({
+      type: e.type,
+      event: {
+        bubbles: e.bubbles,
+        isLocal: e.isLocal,
+        sessionId: e.sessionId,
+        userId: e.userId,
+        index: e.index,
+        text: e.text
+      }
+    });
+  },
+
+  sendRefEvent: function(e) {
+    Overdrive.send({
+      type: e.type,
+      event: {
+        bubbles: e.bubbles,
+        isLocal: e.isLocal,
+        sessionId: e.sessionId,
+        userId: e.userId,
+        newIndex: e.newIndex,
+        oldIndex: e.oldIndex
+      }
+    });
+  },
+
+  create: function(title, content, index, userId, accessToken) {
+    Overdrive.content = content;
+    Overdrive.index = index;
     gapi.load('auth:client', function() {
       gapi.auth.setToken({access_token: accessToken});
       rtclient.createRealtimeFile(title, rtclient.REALTIME_MIMETYPE, function(file) {
