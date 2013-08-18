@@ -28,5 +28,6 @@ def get_syntax(file_name):
     '.py': 'Packages/Python/Python.tmLanguage',
     '.js': 'Packages/JavaScript/JavaScript.tmLanguage',
     '.html': 'Packages/HTML/HTML.tmLanguage',
+    '.tpl': 'Packages/HTML/HTML.tmLanguage',
   }
   return m.get(ext)

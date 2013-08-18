@@ -188,6 +188,5 @@ class OverdriveView(object):
       return index
 
   def get_scope_and_icon(self, user_id):
-    icons = 'dot', 'grey_x', 'bookmark', 'circle'
     user_index = self.get_user_index(user_id)
-    return 'overdrive.user-%s' % user_index, icons[user_index%len(icons)]
+    return 'overdrive.user-%s' % user_index, 'bookmark'

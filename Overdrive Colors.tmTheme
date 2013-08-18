@@ -1,0 +1,52 @@
+        <dict>
+            <key>name</key>
+            <string>Overdrive: User 0</string>
+            <key>scope</key>
+            <string>overdrive.user-0</string>
+            <key>settings</key>
+            <dict>
+                <key>foreground</key>
+                <string>#1187BD</string>
+                <key>background</key>
+                <string>#1187BD</string>
+            </dict>
+        </dict>
+        <dict>
+            <key>name</key>
+            <string>Overdrive: User 1</string>
+            <key>scope</key>
+            <string>overdrive.user-1</string>
+            <key>settings</key>
+            <dict>
+                <key>foreground</key>
+                <string>#CD5950</string>
+                <key>background</key>
+                <string>#CD5950</string>
+            </dict>
+        </dict>
+        <dict>
+            <key>name</key>
+            <string>Overdrive: User 2</string>
+            <key>scope</key>
+            <string>overdrive.user-2</string>
+            <key>settings</key>
+            <dict>
+                <key>foreground</key>
+                <string>#9F11BD</string>
+                <key>background</key>
+                <string>#9F11BD</string>
+            </dict>
+        </dict>
+        <dict>
+            <key>name</key>
+            <string>Overdrive: User 3</string>
+            <key>scope</key>
+            <string>overdrive.user-3</string>
+            <key>settings</key>
+            <dict>
+                <key>foreground</key>
+                <string>#11BD37</string>
+                <key>background</key>
+                <string>#11BD37</string>
+            </dict>
+        </dict>
