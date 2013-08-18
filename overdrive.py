@@ -10,9 +10,6 @@ import odfile
 import odserver
 
 
-files = {}
-
-
 def callback(event):
   view_id = event.pop('view')
   files[view_id].bridge.call_event(event)
@@ -24,10 +21,16 @@ def start_server():
     host=settings.get('server_host'),
     port=settings.get('server_port'),
     callback=callback,
+    server_path=os.path.join(sublime.packages_path(), 'Overdrive'),
   ))
   thread.setDaemon(True)
   thread.start()
-start_server()
+
+
+files = getattr(sublime, 'files', None)
+if files is None:
+  files = sublime.files = {}
+  start_server()
 
 
 class OverdriveJoinCommand(sublime_plugin.WindowCommand):
@@ -114,6 +117,9 @@ class OverdriveView(object):
       return
     if self.is_opened:
       self.view.set_name(metadata['title'])
+      syntax = odutils.get_syntax(metadata['title'])
+      if syntax:
+        self.view.set_syntax_file(syntax)
     else:
       self.view.erase_status('Overdrive')
       sublime.message_dialog('File shared! Others can join in this file '
@@ -141,5 +147,10 @@ class OverdriveView(object):
     q('close')
     window = self.view.window()
     window.focus_view(self.view)
-    window.run_command('close_file')
+    window.run_command('close')
     self.view = None
+
+  @odutils.auto_main_threaded
+  def set_error_message(self, message):
+    sublime.status_message(message)
+

@@ -28,7 +28,7 @@ class OverdriveFile(object):
     thread.start()
 
   def on_error(self, error):
-    sublime.status_message(error)
+    self.od_view.set_error_message(error)
     self.od_view.close()
 
   def on_metadata_loaded(self, metadata):
