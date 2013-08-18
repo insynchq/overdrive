@@ -56,6 +56,9 @@ class OverdriveFile(object):
   def set_text(self, text):
     self.bridge.set_text(text)
 
+  def set_selection(self, point):
+    pass
+
 
 def mock_open(od_file):
   od_file.od_view.set_title('Test')

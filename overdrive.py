@@ -73,6 +73,16 @@ class OverdriveEventListener(sublime_plugin.EventListener):
     if od_file:
       od_file.od_view.view = None
 
+  def on_selection_modified(self, view):
+    sel = view.sel()
+    if not sel:
+      return
+    point = sel[0].a
+    od_file = files.get(view.id())
+    if not od_file:
+      return
+    od_file.set_selection(point)
+
 
 class OverdriveView(object):
 
@@ -80,6 +90,7 @@ class OverdriveView(object):
     self.view = view
     self.id = view.id()
     self.is_opened = False
+    self.users = []
 
   def open(self):
     self.view.set_status("Overdrive", "Loading file...")
@@ -143,6 +154,18 @@ class OverdriveView(object):
     self.view.end_edit(edit)
 
   @odutils.auto_main_threaded
+  def set_session_selection(self, user_id, session_id, point):
+    region_key = 'overdrive.sess-%s' % session_id
+    scope, icon = self.get_scope_and_icon(user_id)
+    region = sublime.Region(point, point)
+    self.view.add_regions(region_key, [region], scope, icon, sublime.DRAW_EMPTY)
+
+  @odutils.auto_main_threaded
+  def close_session(self, user_id, session_id):
+    region_key = 'overdrive.sess-%s' % session_id
+    self.view.erase_regions(region_key)
+
+  @odutils.auto_main_threaded
   def close(self):
     q('close')
     window = self.view.window()
@@ -154,3 +177,15 @@ class OverdriveView(object):
   def set_error_message(self, message):
     sublime.status_message(message)
 
+  def get_user_index(self, user_id):
+    try:
+      return self.users.index(user_id)
+    except ValueError:
+      index = len(self.users)
+      self.users.append(user_id)
+      return index
+
+  def get_scope_and_icon(self, user_id):
+    icons = 'dot', 'grey_x', 'bookmark', 'circle'
+    user_index = self.get_user_index(user_id)
+    return 'overdrive.user-%s' % user_index, icons[user_index%len(icons)]
