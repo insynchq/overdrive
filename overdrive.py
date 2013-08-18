@@ -1,14 +1,33 @@
 import os
+import threading
 
-import sublime, sublime_plugin
+import sublime
+import sublime_plugin
 import q
-import ghost
 
 import odutils
 import odfile
+import odserver
 
 
 files = {}
+
+
+def callback(event):
+  view_id = event.pop('view')
+  files[view_id].bridge.call_event(event)
+
+
+def start_server():
+  settings = sublime.load_settings("Overdrive.sublime-settings")
+  thread = threading.Thread(target=odserver.serve, kwargs=dict(
+    host=settings.get('server_host'),
+    port=settings.get('server_port'),
+    callback=callback,
+  ))
+  thread.setDaemon(True)
+  thread.start()
+start_server()
 
 
 class OverdriveJoinCommand(sublime_plugin.WindowCommand):
@@ -97,7 +116,8 @@ class OverdriveView(object):
       self.view.set_name(metadata['title'])
     else:
       self.view.erase_status('Overdrive')
-      sublime.message_dialog('File shared! Others can join in this file through this ID:\n%s' % metadata['id'])
+      sublime.message_dialog('File shared! Others can join in this file '
+                             'through this ID:\n%s' % metadata['id'])
 
   @odutils.auto_main_threaded
   def insert_text(self, index, text):
@@ -123,4 +143,3 @@ class OverdriveView(object):
     window.focus_view(self.view)
     window.run_command('close_file')
     self.view = None
-

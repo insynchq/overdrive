@@ -2,8 +2,7 @@ var Overdrive = {
 
   CLIENT_ID: '849493785001.apps.googleusercontent.com',
 
-  events: [],
-  noAlert: false,
+  view: null,
 
   initializeModel: function(model) {
     var string = model.createString(Overdrive.defaultContent);
@@ -11,11 +10,15 @@ var Overdrive = {
   },
 
   send: function(o) {
-    Overdrive.events.push(o);
-    console.log(o);
-    if (!Overdrive.noAlert) {
-      alert('.');
-    }
+    o.view = Overdrive.view;
+    superagent.post('/')
+      .send(o)
+      .end(function(res) {
+        if (o.type == 'error') {
+          alert();
+        }
+      });
+    console.log('sent:', o);
   },
 
   sendTextEvent: function(e) {
@@ -32,10 +35,8 @@ var Overdrive = {
     });
   },
 
-  getEvents: function() {
-    var events = Overdrive.events;
-    Overdrive.events = [];
-    return JSON.stringify(events);
+  setView: function(view) {
+    Overdrive.view = view;
   },
 
   setText: function(text) {
@@ -143,12 +144,7 @@ var Overdrive = {
         immediate: false
       }, function(token) {
         if (token) {
-          Overdrive.send({
-            type: 'authorized',
-            token: {
-              access_token: token.access_token
-            }
-          });
+          console.log(token);
         }
       });
     });

@@ -1,28 +1,29 @@
-import functools
 import threading
 
-import q
 import sublime
 
-import bridge
+import odbridge
 
 
 class OverdriveFile(object):
 
   def __init__(self, od_view):
-    settings = sublime.load_settings("OverdriveAccess.sublime-settings")
+    settings = sublime.load_settings("Overdrive.sublime-settings")
     self.od_view = od_view
-    self.bridge = bridge.Bridge(
+    self.bridge = odbridge.Bridge(
       user_id=settings.get('user_id'),
       access_token=settings.get('access_token'),
+      server_host=settings.get('server_host'),
+      server_port=settings.get('server_port'),
     )
     self.bridge.on('error')(self.on_error)
     self.bridge.on('file_metadata_loaded')(self.on_metadata_loaded)
     self.bridge.on('file_content_loaded')(self.on_content_loaded)
     self.bridge.on('text_inserted')(self.on_text_inserted)
     self.bridge.on('text_deleted')(self.on_text_deleted)
-    self.bridge.open('http://localhost:3000/')
-    thread = threading.Thread(target=self.bridge.listen)
+    self.bridge.open()
+    self.bridge.set_view(od_view.id)
+    thread = threading.Thread(target=self.bridge.wait)
     thread.setDaemon(True)
     thread.start()
 
