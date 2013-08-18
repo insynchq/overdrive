@@ -3,22 +3,34 @@ var Overdrive = {
   CLIENT_ID: '849493785001.apps.googleusercontent.com',
 
   view: null,
+  events: [],
 
   initializeModel: function(model) {
     var string = model.createString(Overdrive.defaultContent);
     model.getRoot().set('text', string);
   },
 
-  send: function(o) {
-    o.view = Overdrive.view;
-    superagent.post('/')
-      .send(o)
-      .end(function(res) {
-        if (o.type == 'error') {
-          alert();
-        }
-      });
-    console.log('sent:', o);
+  send: function(e) {
+    e.view = Overdrive.view;
+    Overdrive.events.push(e);
+  },
+
+  postEvents: function() {
+    var e = Overdrive.events.shift();
+    if (e) {
+      superagent.post('/')
+        .send(e)
+        .end(function(res) {
+          console.log('sent:', e);
+          if (e.type == 'error') {
+            alert();
+          } else {
+            Overdrive.postEvents();
+          }
+        });
+    } else {
+      setTimeout(Overdrive.postEvents, 10);
+    }
   },
 
   sendTextEvent: function(e) {
@@ -97,6 +109,8 @@ var Overdrive = {
   },
 
   open: function(fileId, userId, accessToken) {
+    Overdrive.postEvents();
+
     var options = {
       clientId: Overdrive.CLIENT_ID,
       initializeModel: Overdrive.initializeModel,
