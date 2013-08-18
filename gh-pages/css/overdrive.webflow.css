@@ -38,14 +38,14 @@ p {
   margin-bottom: 5px;
 }
 pre {
-  background-color: #eee;
   overflow-x: auto;
 }
 code {
+  background-color: #eee;
   font-family: 'Ubuntu Mono', monospace;
   padding: 5px;
   display: inline-block;
-  width: 40em;
+  white-space: nowrap;
 }
 .button {
   display: inline-block;
@@ -56,8 +56,14 @@ code {
   text-decoration: none;
 }
 .header {
-  padding-top: 100px;
-  padding-bottom: 100px;
+  margin-top: 100px;
+  margin-bottom: 100px;
+}
+.how-it-works {
+  margin-top: 100px;
+  margin-bottom: 100px;
+  padding: 0 25%;
+  text-align: center;
 }
 .footer {
   margin-top: 100px;
@@ -71,4 +77,9 @@ code {
   background-repeat: no-repeat no-repeat;
   opacity: 0.8;
   text-align: center;
+}
+.menu {
+  background-color: #666;
+  padding: 2px 5px;
+  color: white;
 }
