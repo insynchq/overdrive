@@ -44,7 +44,7 @@ var Overdrive = {
   },
 
   setRef: function(index) {
-    Overdrive.ref.index = Overdrive.index = index;
+    Overdrive.selections.set(Overdrive.sessionId + ':' + Overdrive.userId, index);
   },
 
   onFileLoaded: function(doc) {
@@ -70,37 +70,33 @@ var Overdrive = {
     });
 
     // Selection
+    Overdrive.index = Overdrive.index || 0;
+    var selections;
+    Overdrive.selections = selections = model.getRoot().get('selections');
     var refName;
     doc.getCollaborators().forEach(function(c) {
       if (c.isMe) {
         refName = c.sessionId + ':' + c.userId;
+        Overdrive.sessionId = c.sessionId;
+        Overdrive.userId = c.userId;
+      } else {
+        Overdrive.sendRefEvent({
+          type: 'reference_shifted',
+          bubbles: false,
+          isLocal: false,
+          sessionId: c.sessionId,
+          userId: c.userId,
+          newValue: selections.get(c.sessionId + ':' + c.userId) || 0
+        });
       }
     });
-    Overdrive.index = Overdrive.index || 0;
-    var selections = model.getRoot().get('selections');
     var ref = selections.get(refName);
-    if (ref) {
-      Overdrive.ref = ref;
-    } else {
-      Overdrive.ref = ref = string.registerReference(Overdrive.index, false);
-      selections.set(refName, ref);
+    if (!ref) {
+      selections.set(refName, Overdrive.index);
     }
-    selections.values().forEach(function(r) {
-      r.addEventListener(
-        gapi.drive.realtime.EventType.REFERENCE_SHIFTED,
-        Overdrive.sendRefEvent
-      );
-    });
     selections.addEventListener(
       gapi.drive.realtime.EventType.VALUE_CHANGED,
-      function(e) {
-        if (e.newValue) {
-          e.newValue.addEventListener(
-            gapi.drive.realtime.EventType.REFERENCE_SHIFTED,
-            Overdrive.sendRefEvent
-          )
-        }
-      }
+      Overdrive.sendRefEvent
     )
   },
 
@@ -120,14 +116,13 @@ var Overdrive = {
 
   sendRefEvent: function(e) {
     Overdrive.send({
-      type: e.type,
+      type: 'reference_shifted',
       event: {
         bubbles: e.bubbles,
         isLocal: e.isLocal,
         sessionId: e.sessionId,
         userId: e.userId,
-        newIndex: e.newIndex,
-        oldIndex: e.oldIndex
+        index: e.newValue
       }
     });
   },
