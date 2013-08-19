@@ -28,12 +28,12 @@ install if you know what you're doing.
 To get it, you basically just need to clone the repo into
 Sublime Text's Packages directory.  _Btw, you have to name it
 "Overdrive" (hard-coded values ftw)._ Setting up dependecies
-is a bit trickier. You need to have q, Bottle, Ghost.py and
-PySide/PyQT installed somewhere. Notice the `AAA.py` file?
+is a bit trickier. You need to have `q`, `Bottle`, `Ghost.py` and
+`PySide`/`PyQT` installed somewhere. Notice the `AAA.py` file?
 After installing dependencies, you need to modify that and
 set the paths so that the packages you just installed can
 be loaded. Most systems have python2.7 now by default and
-installing PySide/PyQT manually in a virtualenv could be
+installing `PySide`/`PyQT` manually in a virtualenv could be
 a pain. It was for us, so we just used paths for the python2.7
 versions and it worked :P
 
